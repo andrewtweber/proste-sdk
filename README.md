@@ -40,5 +40,7 @@ try {
 ## Todo
 
 * Make options available on all requests
-* Authenticated requests
+* Basic authorization trait
 * Submit to Packagist
+* Tests
+
