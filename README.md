@@ -39,6 +39,6 @@ try {
 
 ## Todo
 
-* Add example classes to the repository
 * Make options available on all requests
 * Authenticated requests
+* Submit to Packagist

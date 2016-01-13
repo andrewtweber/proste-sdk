@@ -1,0 +1,16 @@
+{
+    "name": "andrewtweber/proste-sdk",
+    "description": "Proste SDK - easy SDK for any RESTful API.",
+    "keywords": ["rest", "restful", "api", "sdk"],
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": ">=5.5.9",
+        "guzzlehttp/guzzle": "^6.1@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Proste\\": "src/"
+        }
+    }
+}
