@@ -125,7 +125,7 @@ abstract class SDK
     protected function baseUrl($url)
     {
         return rtrim($this->base_url, '/') . '/' . ltrim($url, '/');
-    };
+    }
 
     /**
      * Build a URL with array of params
