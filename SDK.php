@@ -10,6 +10,13 @@ abstract class SDK
     protected $guzzle;
 
     /**
+     * Base url of the API
+     *
+     * @var string
+     */
+    protected $base_url;
+
+    /**
      * Default parameters for all requests
      *
      * @var array
@@ -87,7 +94,7 @@ abstract class SDK
         try {
             $response = $this->guzzle->request($verb, $this->buildUrl($url, $params), $this->getOptions());
 
-            if ($response->getStatusCode() != '200') {
+            if (substr($response->getStatusCode(), 0, 1) != '2') {
                 throw new \Exception($this->name . " API failed: " . $response->getBody());
             }
         } catch (\Exception $e) {
@@ -99,12 +106,14 @@ abstract class SDK
 
     /**
      * Convert relative URL to full URL
-     * Must be defined by child class
      *
      * @param  string  $url
      * @return string
      */
-    abstract protected function baseUrl($url);
+    protected function baseUrl($url)
+    {
+        return rtrim($this->base_url, '/') . '/' . ltrim($url, '/');
+    };
 
     /**
      * Build a URL with array of params
