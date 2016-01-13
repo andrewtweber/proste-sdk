@@ -2,6 +2,12 @@
 
 Easy SDK for any RESTful API
 
+To install simply run
+
+```
+$ composer require andrewtweber/proste-sdk
+```
+
 ## Extending
 
 Proste is an abstract class. In most cases you simply need to extend it, give it a name, and specify the base URL
@@ -41,6 +47,4 @@ try {
 
 * Make options available on all requests
 * Basic authorization trait
-* Submit to Packagist
 * Tests
-
