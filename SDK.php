@@ -70,6 +70,18 @@ abstract class SDK
     }
 
     /**
+     * Generic PATCH request
+     *
+     * @param  string  $url
+     * @param  array  $params
+     * @return array
+     */
+    public function patch($url, array $params = [])
+    {
+        return $this->request('PATCH', $url, $params);
+    }
+
+    /**
      * Generic DELETE request
      *
      * @param  string  $url

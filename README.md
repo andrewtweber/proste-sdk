@@ -1,6 +1,6 @@
 # proste-sdk
 
-Easy SDK for any API
+Easy SDK for any RESTful API
 
 ## Extending
 
