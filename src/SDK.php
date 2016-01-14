@@ -10,11 +10,16 @@ abstract class SDK
     protected $guzzle;
 
     /**
+     * @var string
+     */
+    public $name;
+
+    /**
      * Base url of the API
      *
      * @var string
      */
-    protected $base_url;
+    public $base_url;
 
     /**
      * Default parameters for all requests
