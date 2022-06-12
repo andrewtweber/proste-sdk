@@ -1,35 +1,31 @@
-<?php namespace Proste;
+<?php
 
+namespace Proste\Samples;
+
+use Proste\SDK;
+
+/**
+ * Class GitHub
+ *
+ * @package Proste\Samples
+ */
 class GitHub extends SDK
 {
-    /**
-     * @var string
-     */
-    protected $name = 'GitHub';
+    public string $name = 'GitHub';
 
-    /**
-     * @var string
-     */
-    protected $base_url = 'https://api.github.com/';
+    public string $base_url = 'https://api.github.com/';
 
-    /**
-     * @var string
-     */
-    protected $username;
+    protected string $username;
 
-    /**
-     * @var string
-     */
-    protected $token;
+    protected string $token;
 
     /**
      * Authorize requests with a username and token
      *
-     * @param  string  $username
-     * @param  string  $token
-     * @return void
+     * @param string $username
+     * @param string $token
      */
-    public function __construct($username, $token)
+    public function __construct(string $username, string $token)
     {
         parent::__construct();
 
@@ -40,9 +36,11 @@ class GitHub extends SDK
     /**
      * Get repository details
      *
-     * @param  string  $repository
+     * @param string $repository
+     *
+     * @return array
      */
-    public function repo($repository)
+    public function repo(string $repository): array
     {
         return $this->get('/repos/' . $repository);
     }
@@ -50,9 +48,11 @@ class GitHub extends SDK
     /**
      * Get releases
      *
+     * @param string $repository
+     *
      * @return array
      */
-    public function releases($repository)
+    public function releases(string $repository): array
     {
         return $this->get('/repos/' . $repository . '/releases');
     }
@@ -60,9 +60,11 @@ class GitHub extends SDK
     /**
      * Get issues
      *
+     * @param string $repository
+     *
      * @return array
      */
-    public function issues($repository)
+    public function issues(string $repository): array
     {
         return $this->get('/repos/' . $repository . '/issues');
     }
@@ -72,14 +74,13 @@ class GitHub extends SDK
      *
      * @return array
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [
             'auth' => [
-                $this->username, 
+                $this->username,
                 $this->token,
             ],
         ];
     }
 }
-

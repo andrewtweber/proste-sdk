@@ -1,37 +1,29 @@
-<?php namespace Proste;
+<?php
+
+namespace Proste;
 
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
+use Proste\Exceptions\HttpException;
 
+/**
+ * Class SDK
+ *
+ * @package Proste
+ */
 abstract class SDK
 {
-    /**
-     * @var Guzzle
-     */
-    protected $guzzle;
+    protected Guzzle $guzzle;
 
-    /**
-     * @var string
-     */
-    public $name;
+    public string $name;
 
-    /**
-     * Base url of the API
-     *
-     * @var string
-     */
-    public $base_url;
+    public string $base_url;
 
-    /**
-     * Default parameters for all requests
-     *
-     * @var array
-     */
-    protected $params = [];
+    protected array $params = [];
 
     /**
      * Create a new SDK instance with a GuzzleHttp client
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -41,81 +33,87 @@ abstract class SDK
     /**
      * Generic GET request
      *
-     * @param  string  $url
-     * @param  array  $params
+     * @param string $url
+     * @param array  $params
+     *
      * @return array
      */
-    public function get($url, array $params = [])
+    public function get(string $url, array $params = []): array
     {
-        return $this->request('GET', $url, $params);
+        return $this->request(Verb::Get, $url, $params);
     }
 
     /**
      * Generic POST request
      *
-     * @param  string  $url
-     * @param  array  $params
+     * @param string $url
+     * @param array  $params
+     *
      * @return array
      */
-    public function post($url, array $params = [])
+    public function post(string $url, array $params = []): array
     {
-        return $this->request('POST', $url, $params);
+        return $this->request(Verb::Post, $url, $params);
     }
 
     /**
      * Generic PUT request
      *
-     * @param  string  $url
-     * @param  array  $params
+     * @param string $url
+     * @param array  $params
+     *
      * @return array
      */
-    public function put($url, array $params = [])
+    public function put(string $url, array $params = []): array
     {
-        return $this->request('PUT', $url, $params);
+        return $this->request(Verb::Put, $url, $params);
     }
 
     /**
      * Generic PATCH request
      *
-     * @param  string  $url
-     * @param  array  $params
+     * @param string $url
+     * @param array  $params
+     *
      * @return array
      */
-    public function patch($url, array $params = [])
+    public function patch(string $url, array $params = []): array
     {
-        return $this->request('PATCH', $url, $params);
+        return $this->request(Verb::Patch, $url, $params);
     }
 
     /**
      * Generic DELETE request
      *
-     * @param  string  $url
-     * @param  array  $params
+     * @param string $url
+     * @param array  $params
+     *
      * @return array
      */
-    public function delete($url, array $params = [])
+    public function delete(string $url, array $params = []): array
     {
-        return $this->request('DELETE', $url, $params);
+        return $this->request(Verb::Delete, $url, $params);
     }
 
     /**
      * Generic request
      *
-     * @param  string  $verb  GET, POST, etc.
-     * @param  string  $url  Relative URL
-     * @param  array  $params  Query parameters
+     * @param Verb   $verb GET, POST, etc.
+     * @param string $url Relative URL
+     * @param array  $params Query parameters
+     *
      * @return array
      */
-    public function request($verb, $url, array $params = [])
+    public function request(Verb $verb, string $url, array $params = []): array
     {
         try {
-            $response = $this->guzzle->request($verb, $this->buildUrl($url, $params), $this->getOptions());
-
-            if (substr($response->getStatusCode(), 0, 1) != '2') {
-                throw new \Exception($this->name . " API failed: " . $response->getBody());
-            }
-        } catch (\Exception $e) {
-            throw new \Exception($this->name . " API failed: " . $e->getMessage());
+            $response = $this->guzzle->request(
+                $verb->value,
+                $this->buildUrl($url, $params),
+                $this->getOptions()
+            );
+        } catch (ClientException|ServerException $e) {
+            throw HttpException::make($this, $e->getResponse()->getStatusCode(), $e);
         }
 
         return json_decode($response->getBody(), true);
@@ -124,10 +122,11 @@ abstract class SDK
     /**
      * Convert relative URL to full URL
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return string
      */
-    protected function baseUrl($url)
+    protected function baseUrl(string $url): string
     {
         return rtrim($this->base_url, '/') . '/' . ltrim($url, '/');
     }
@@ -135,11 +134,12 @@ abstract class SDK
     /**
      * Build a URL with array of params
      *
-     * @param  string  $url 
-     * @param  array  $params
+     * @param string $url
+     * @param array  $params
+     *
      * @return string
      */
-    protected function buildUrl($url, array $params = [])
+    protected function buildUrl(string $url, array $params = []): string
     {
         $params = http_build_query($this->mergeParams($params));
 
@@ -149,10 +149,11 @@ abstract class SDK
     /**
      * Merge user parameters with SDK defaults
      *
-     * @param  array  $params
+     * @param array $params
+     *
      * @return array
      */
-    protected function mergeParams(array $params = [])
+    protected function mergeParams(array $params = []): array
     {
         return array_merge($this->params, $params);
     }
@@ -162,9 +163,8 @@ abstract class SDK
      *
      * @return array
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [];
     }
 }
-
