@@ -28,7 +28,7 @@ class HttpException extends RuntimeException
             401 => new Http401UnauthorizedException($message, $code, $previous),
             403 => new Http403ForbiddenException($message, $code, $previous),
             404 => new Http404NotFoundException($message, $code, $previous),
-            default => new static($message, $code, $previous),
+            default => new HttpException($message, $code, $previous),
         };
     }
 }
