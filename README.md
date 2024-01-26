@@ -1,5 +1,7 @@
 # proste-sdk
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/andrewtweber/proste-sdk/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/andrewtweber/proste-sdk/tree/master)
+
 Easy SDK for any RESTful API
 
 To install simply run
