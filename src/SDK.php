@@ -20,6 +20,10 @@ abstract class SDK
 
     public string $base_url;
 
+    protected array $headers = [
+        'Accept' => 'application/json',
+    ];
+
     protected array $params = [];
 
     /**
@@ -53,7 +57,9 @@ abstract class SDK
      */
     public function post(string $url, array $params = []): array
     {
-        return $this->request(Verb::Post, $url, $params);
+        return $this->request(Verb::Post, $url, options: [
+            'form_params' => $params,
+        ]);
     }
 
     /**
@@ -95,22 +101,38 @@ abstract class SDK
         return $this->request(Verb::Delete, $url, $params);
     }
 
+    public function send(Request $request): array
+    {
+        try {
+            $response = $this->guzzle->request(
+                $request->verb->value,
+                $this->buildUrl($request->url, $request->getParams()),
+                array_merge($this->getOptions(), $request->getOptions()),
+            );
+        } catch (ClientException|ServerException $e) {
+            throw HttpException::make($this, $e->getResponse()->getStatusCode(), $e);
+        }
+
+        return json_decode($response->getBody(), true);
+    }
+
     /**
      * Generic request
      *
      * @param Verb   $verb GET, POST, etc.
      * @param string $url Relative URL
      * @param array  $params Query parameters
+     * @param array  $options Additional options
      *
      * @return array
      */
-    public function request(Verb $verb, string $url, array $params = []): array
+    public function request(Verb $verb, string $url, array $params = [], array $options = []): array
     {
         try {
             $response = $this->guzzle->request(
                 $verb->value,
                 $this->buildUrl($url, $params),
-                $this->getOptions()
+                array_merge($this->getOptions(), $options),
             );
         } catch (ClientException|ServerException $e) {
             throw HttpException::make($this, $e->getResponse()->getStatusCode(), $e);
@@ -159,7 +181,7 @@ abstract class SDK
     }
 
     /**
-     * SDK options
+     * SDK options for every request
      *
      * @return array
      */
