@@ -2,9 +2,8 @@
 
 namespace Proste;
 
-use GuzzleHttp\Client as Guzzle;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Http;
 use Proste\Exceptions\HttpException;
 
 /**
@@ -14,8 +13,6 @@ use Proste\Exceptions\HttpException;
  */
 abstract class SDK
 {
-    protected Guzzle $guzzle;
-
     public string $name;
 
     public string $base_url;
@@ -27,11 +24,10 @@ abstract class SDK
     protected array $params = [];
 
     /**
-     * Create a new SDK instance with a GuzzleHttp client
+     * Create a new SDK instance
      */
     public function __construct()
     {
-        $this->guzzle = new Guzzle();
     }
 
     /**
@@ -103,17 +99,13 @@ abstract class SDK
 
     public function send(Request $request): array
     {
-        try {
-            $response = $this->guzzle->request(
-                $request->verb->value,
-                $this->buildUrl($request->url, $request->getParams()),
-                array_merge($this->getOptions(), $request->getOptions()),
-            );
-        } catch (ClientException|ServerException $e) {
-            throw HttpException::make($this, $e->getResponse()->getStatusCode(), $e);
-        }
+        $response = Http::send(
+            $request->verb->value,
+            $this->buildUrl($request->url, $request->getParams()),
+            array_merge($this->getOptions(), $request->getOptions()),
+        );
 
-        return json_decode($response->getBody(), true);
+        return $this->parseResponse($response);
     }
 
     /**
@@ -128,17 +120,29 @@ abstract class SDK
      */
     public function request(Verb $verb, string $url, array $params = [], array $options = []): array
     {
-        try {
-            $response = $this->guzzle->request(
-                $verb->value,
-                $this->buildUrl($url, $params),
-                array_merge($this->getOptions(), $options),
-            );
-        } catch (ClientException|ServerException $e) {
-            throw HttpException::make($this, $e->getResponse()->getStatusCode(), $e);
+        $response = Http::send(
+            $verb->value,
+            $this->buildUrl($url, $params),
+            array_merge($this->getOptions(), $options),
+        );
+
+        return $this->parseResponse($response);
+    }
+
+    /**
+     * Throw an exception if the request failed, otherwise decode the JSON body
+     *
+     * @param Response $response
+     *
+     * @return array
+     */
+    protected function parseResponse(Response $response): array
+    {
+        if ($response->failed()) {
+            throw HttpException::make($this, $response->status(), $response->toException());
         }
 
-        return json_decode($response->getBody(), true);
+        return $response->json() ?? [];
     }
 
     /**
@@ -181,7 +185,7 @@ abstract class SDK
     }
 
     /**
-     * SDK options for every request
+     * Guzzle options for every request
      *
      * @return array
      */

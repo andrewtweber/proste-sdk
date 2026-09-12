@@ -45,6 +45,23 @@ try {
 }
 ```
 
+## Testing
+
+Requests are sent through Laravel's `Http` facade, so inside a Laravel application you can
+fake responses and assert against sent requests like any other HTTP client call:
+
+```php
+use Illuminate\Support\Facades\Http;
+
+Http::fake([
+    'api.github.com/*' => Http::response(['name' => 'proste-sdk']),
+]);
+
+$repo = (new GitHub())->get('repos/andrewtweber/proste-sdk');
+
+Http::assertSent(fn ($request) => str_contains($request->url(), 'proste-sdk'));
+```
+
 ## Todo
 
 * Make options available on all requests
